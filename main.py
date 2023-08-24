@@ -1,5 +1,6 @@
 # Python
 # Project
+from typing import Any
 from crypto_info import Asset
 # Externals
 
@@ -21,4 +22,14 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    #run()
+    class A(object):
+        def __new__(cls, *args, **kwargs):
+            print("Creating instance")
+            #return super(A, cls).__new__(cls)
+            return object.__new__(cls, *args, **kwargs)
+    
+        def __init__(self):
+            print("Init is called")
+  
+    A()
