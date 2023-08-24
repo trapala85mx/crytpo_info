@@ -1,0 +1,1 @@
+from .models.asset import Asset
