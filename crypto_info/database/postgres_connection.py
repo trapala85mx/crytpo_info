@@ -1,35 +1,35 @@
 # Python
 from crypto_info.abstracts.connection import Connection
+
 # Project
 # Externals
 from decouple import config
 from peewee import PostgresqlDatabase
 
+
 class PostgreSQLConnection(Connection):
-        
     def __init__(self) -> None:
-        self._db_name = config('CRYPTO_INFO_DB_NAME')
-        self._user = config('CRYPTO_INFO_DB_USER')
-        self._pasww = config('CRYPTO_INFO_DB_PASS')
-        self._host = config('CRYPTO_INFO_DB_HOST')
-        self._port = config('CRYPTO_INFO_DB_PORT')
-    
-    def _create_connection(self):
-        if self._con:
-            return self._con
-        
+        self._db_name: str = config("CRYPTO_INFO_DB_NAME")
+        self._user: str = config("CRYPTO_INFO_DB_USER")
+        self._pasww: str = config("CRYPTO_INFO_DB_PASS")
+        self._host: str = config("CRYPTO_INFO_DB_HOST")
+        self._port: int = config("CRYPTO_INFO_DB_PORT")
+
+    def _connect(self) -> PostgresqlDatabase:
         return PostgresqlDatabase(
-            self._db_name, 
-            user=self._user, 
+            self._db_name,
+            user=self._user,
             password=self._pasww,
-            host=self._host, 
-            port=self._port)
-    
+            host=self._host,
+            port=self._port,
+        )
+
     @classmethod
-    def get_connection(self):
-        self._con = self._create_connection()
-        return self._con
-    
+    def get_connection(cls) -> PostgresqlDatabase:
+        if cls._database is None:
+            cls._database = cls()._connect()
+        
+        return cls._database
+
     def close(self):
-        if self._con:
-            self._con.close()
+        self._database.close()

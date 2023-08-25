@@ -2,9 +2,12 @@
 from abc import ABC, abstractmethod
 # Project
 # Externals
+from peewee import PostgresqlDatabase, MySQLDatabase
 
 
 class Connection(ABC):
+    
+    _database: PostgresqlDatabase | MySQLDatabase = None
     
     def __init__(self) -> None:
         self._db_name = None
@@ -19,7 +22,7 @@ class Connection(ABC):
     
     @classmethod
     @abstractmethod
-    def get_orm(cls):
+    def get_connection(cls):
         pass
     
     @abstractmethod
