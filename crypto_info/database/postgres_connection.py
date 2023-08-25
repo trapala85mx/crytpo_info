@@ -33,5 +33,5 @@ class PostgreSQLConnection(Connection):
         
         return cls._database
 
-    def close(self):
+    def close(self) -> None:
         self._database.close()
