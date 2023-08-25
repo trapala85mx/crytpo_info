@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 @dataclass(kw_only=True)
 class Asset:
-    
+    symbol: str
     tick_size: str
     step_size: str
     min_qty: str
