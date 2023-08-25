@@ -6,18 +6,20 @@ from abc import ABC, abstractmethod
 
 class Connection(ABC):
     
-    _con = None
-    
     def __init__(self) -> None:
-        pass    
+        self._db_name = None
+        self._user = None
+        self._pasww = None
+        self._host = None
+        self._port = None
     
     @abstractmethod
-    def _create_connection(self):
+    def _connect(self):
         pass
     
-    @abstractmethod
     @classmethod
-    def get_connection(self):
+    @abstractmethod
+    def get_orm(cls):
         pass
     
     @abstractmethod

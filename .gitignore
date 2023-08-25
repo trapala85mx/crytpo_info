@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,dotenv,linux,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,dotenv,linux,macos,windows
-
+.vscode/
 ### Pycharm
 .idea/
 ### dotenv ###
