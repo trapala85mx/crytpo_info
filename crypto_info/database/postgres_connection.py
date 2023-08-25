@@ -2,11 +2,13 @@
 from crypto_info.abstracts.connection import Connection
 
 # Project
+from crypto_info.utils.decorators import singleton
 # Externals
 from decouple import config
 from peewee import PostgresqlDatabase
 
 
+@singleton
 class PostgreSQLConnection(Connection):
     def __init__(self) -> None:
         self._db_name: str = config("CRYPTO_INFO_DB_NAME")
