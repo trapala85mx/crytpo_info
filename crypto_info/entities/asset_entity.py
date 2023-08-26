@@ -9,7 +9,8 @@ from peewee import PostgresqlDatabase, MySQLDatabase
 
 
 class AssetEntity(Model):
-        
+    """Class for mapping an Asset to Database using ORM
+    """        
     id = UUIDField(primary_key=True, default=uuid.uuid4)
     symbol = CharField(max_length=20, unique=True, null=False,index=True)
     tick_size = CharField(max_length=20, unique=False, null=False)
@@ -28,5 +29,10 @@ class AssetEntity(Model):
     
     @classmethod
     def initialize(cls, database: PostgresqlDatabase | MySQLDatabase) -> None:
+        """Set needed databse connection to work properly using the param injected
+
+        Args:
+            database (PostgresqlDatabase): Connection to PostgreSQL Databse
+        """        
         cls._meta.database = database
         
