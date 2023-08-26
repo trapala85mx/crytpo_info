@@ -6,7 +6,8 @@ from peewee import PostgresqlDatabase, MySQLDatabase
 
 
 class Connection(ABC):
-    
+    """Base class for a Database Connection
+    """    
     _database: PostgresqlDatabase | MySQLDatabase = None
     
     def __init__(self) -> None:
@@ -18,13 +19,24 @@ class Connection(ABC):
     
     @abstractmethod
     def _connect(self) -> PostgresqlDatabase | MySQLDatabase:
+        """Make a connection to a Database via ORM
+        
+        returns:
+            [PostgresqlDatabase | MySQLDatabase]: to be used for interact with Database
+        """        
         pass
     
     @classmethod
     @abstractmethod
     def get_connection(cls) -> PostgresqlDatabase | MySQLDatabase:
+        """Returns the connection to the Database
+        returns:
+            [PostgresqlDatabase | MySQLDatabase]: to be used for interact with Database
+        """        
         pass
     
     @abstractmethod
     def close(self) -> None:
+        """Closes Database Connection
+        """        
         pass
