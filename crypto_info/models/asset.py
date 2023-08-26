@@ -6,6 +6,8 @@ from dataclasses import dataclass
 
 @dataclass(kw_only=True)
 class Asset:
+    """Class to represent an Asset in the proyect
+    """    
     symbol: str
     tick_size: str
     step_size: str
@@ -17,4 +19,5 @@ class Asset:
     price_factor: int = field(default=None, init=False)
     qty_factor: int = field(default=None, init=False)
     
-    
+    def __str__(self) -> str:
+        return f"symbol:{self.symbol.upper()}"
