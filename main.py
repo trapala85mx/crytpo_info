@@ -13,38 +13,50 @@ def run():
         'min_qty': '39',
         'min_cost': '5.12070'
     }
-    asset = Asset(
+    asset1 = Asset(
         symbol='suiusdt',
         tick_size = data["tick_size"],
         step_size = data['step_size'],
         min_qty = data['min_qty'],
         min_cost = data['min_cost']
     )
-    asset.max_leverage = '10'
-    asset.price_factor = 1
-    asset.qty_factor = 1
-    asset.price_precision = 0
-    asset.qty_precision = 2
-    
-    print(asset)
-
-    db = PostgreSQLConnection().get_connection()
-    print(db)
-    AssetEntity.initialize(db)
-    AssetEntity.create_table()
-    AssetEntity.create(
-        symbol = asset.symbol,
-        tick_size = asset.tick_size,
-        step_size = asset.step_size,
-        min_qty = asset.min_qty,
-        min_cost = asset.min_cost,
-        max_leverage = asset.max_leverage,
-        price_precision = asset.price_precision,
-        qty_precision = asset.qty_precision,
-        price_factor = asset.price_factor,
-        qty_factor = asset.qty_factor
+    asset1.max_leverage = '10'
+    asset1.price_factor = 1
+    asset1.qty_factor = 1
+    asset1.price_precision = 0
+    asset1.qty_precision = 2
+    asset2 = Asset(
+        symbol='maticusdt',
+        tick_size = data["tick_size"],
+        step_size = data['step_size'],
+        min_qty = data['min_qty'],
+        min_cost = data['min_cost']
     )
+    asset2.max_leverage = '10'
+    asset2.price_factor = 1
+    asset2.qty_factor = 1
+    asset2.price_precision = 0
+    asset2.qty_precision = 2
     
+    db = PostgreSQLConnection().get_connection()
+    
+    AssetEntity.initialize(db)
+    AssetEntity.drop_table()
+    AssetEntity.create_table()
+    
+    #res = AssetEntity.create_asset(asset1)
+    res = AssetEntity.create_many_assets([asset1, asset2])
+    
+    #res = AssetEntity.create_asset(asset2)
+    asset2.max_leverage = '20'
+    res = AssetEntity.update_asset(asset2.__dict__)
+    #print(res)
+    assets = AssetEntity.get_all_assets()
+    for a in assets:
+        print(a.symbol, " - ",a.price_factor)
+    
+    res = AssetEntity.delete_asset_by_symbol("maticusdt")
+    print(res)
     db.close()
 
 if __name__ == '__main__':
@@ -58,6 +70,6 @@ if __name__ == '__main__':
     
         def __init__(self):
             print("Init is called")
-  
+    
     A()
     '''

@@ -4,7 +4,7 @@ import functools
 # Externals
 
 
-def singleton(cls) -> function:
+def singleton(cls):
     """Class Decorator to apply Singleton
 
     Returns:
