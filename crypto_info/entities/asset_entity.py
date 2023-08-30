@@ -1,7 +1,9 @@
 # Python
 import uuid
+
 # Project
 from crypto_info.models.asset import Asset
+
 # Externals
 import psycopg2
 import peewee
@@ -11,10 +13,10 @@ from peewee import PostgresqlDatabase, MySQLDatabase
 
 
 class AssetEntity(Model):
-    """Class for mapping an Asset to Database using ORM
-    """        
+    """Class for mapping an Asset to Database using ORM"""
+
     id = UUIDField(primary_key=True, default=uuid.uuid4)
-    symbol = CharField(max_length=20, unique=True, null=False,index=True)
+    symbol = CharField(max_length=20, unique=True, null=False, index=True)
     tick_size = CharField(max_length=20, unique=False, null=False)
     step_size = CharField(max_length=2, unique=False, null=False)
     min_qty = CharField(max_length=5, unique=False, null=False)
@@ -24,28 +26,24 @@ class AssetEntity(Model):
     qty_precision = IntegerField(null=False, unique=False)
     price_factor = IntegerField(null=False, unique=False)
     qty_factor = IntegerField(null=False, unique=False)
-        
+
     class Meta:
         database = None
-        db_table = 'assets_info'
-    
+        db_table = "assets_info"
+
     @classmethod
     def initialize(cls, database: PostgresqlDatabase | MySQLDatabase) -> None:
         """Set needed databse connection to work properly using the param injected
-        
         Args:
             database (PostgresqlDatabase): Connection to PostgreSQL Databse
-        """        
+        """
         cls._meta.database = database
     
     
-    @classmethod
-    def create_asset(cls, asset:Asset) -> bool:
+    def insert_asset(cls, asset: Asset) -> bool:
         """Insert an Asset into the Database
-        
         Args:
             asset (Asset): Assset to be stored in Database
-            
         Returns:
             uuid: id(Primary Key) of the asset stored
         """
@@ -68,21 +66,16 @@ class AssetEntity(Model):
                 return True
             
             return False
-    
-    
-    @classmethod
-    def create_many_assets(cls, assets:list[Asset]) -> bool:
-        """Insert many Assets into Database
 
+    def insert_many_assets(cls, assets: list[Asset]) -> bool:
+        """Insert many Assets into Database
         Args:
             assets (list[Asset]): List of Assets
-
         Raises:
             ValueError: If List of Assets == 0
-
         Returns:
             bool: Tru if assets where inserted Flase if they were not
-        """        
+        """
         if len(assets) == 0:
             raise ValueError("You didn't send any data to store")
         
@@ -97,30 +90,27 @@ class AssetEntity(Model):
         
         except ValueError as e:
             print(e)
-            
+        
         except peewee.OperationalError as e:
             print("Couldn't insert assets")
             print(e)
-            
+        
         except peewee.IntegrityError as e:
             print(f"Error in insert many assets")
             print(e)
-            
+        
         except psycopg2.errors.UniqueViolation as e:
             print(e)
     
     
-    @classmethod
     def get_all_assets(cls) -> list[Asset]:
         """Retrieves all Assets from Datbase
-
         Raises:
             ValueError: If there are no Assets in DataBase
-
         Returns:
             list[Asset]: List of all Assets in Database
-        """        
-        try:      
+        """
+        try:
             res = AssetEntity.select()
             if res > 0:
                 return res
@@ -133,26 +123,24 @@ class AssetEntity(Model):
             print("Something went wrong retrieving all Assets")
     
     
-    @classmethod
-    def update_asset(cls, data:dict) -> bool:
-        """Update an asset in database 
-
+    def update_asset(cls, data: dict) -> bool:
+        """Update an asset in database
         Args:
             data (dict): Dict with all atributes/cols to be updated
-
         Raises:
             ValueError: If no data is sent
-
         Returns:
             bool: True if asset is updated False if not
-        """        
+        """
         if len(data) == 0:
             raise ValueError("You didn't send data to updated")
         
         try:
-            nrows = AssetEntity.update(**data) \
-                            .where(AssetEntity.symbol == data['symbol'].lower()) \
-                            .execute()
+            nrows = (
+                AssetEntity.update(**data)
+                .where(AssetEntity.symbol == data["symbol"].lower())
+                .execute()
+            )
             
             if nrows >= 1:
                 return True
@@ -166,24 +154,24 @@ class AssetEntity(Model):
             print(e)
     
     
-    @classmethod
-    def delete_asset_by_symbol(cls, symbol:str) -> bool:
+    def delete_asset_by_symbol(cls, symbol: str) -> bool:
         """Delete an Asset based in symbl
-
         Args:
             symbol (str): Asset Symbol to be deleted in Database
-
         Raises:
             ValueError: If no Symbol is sent
-
         Returns:
             bool: True if asset is deleted False if not
-        """        
+        """
         if len(symbol) == 0:
             raise ValueError("You didn't send a symbol")
         
         try:
-            nrows = AssetEntity.delete().where(AssetEntity.symbol == symbol.lower()).execute()
+            nrows = (
+                AssetEntity.delete()
+                .where(AssetEntity.symbol == symbol.lower())
+                .execute()
+            )
             
             if nrows == 1:
                 return True

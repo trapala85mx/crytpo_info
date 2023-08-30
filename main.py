@@ -1,12 +1,18 @@
 # Python
+from pprint import pprint
+import asyncio
 # Project
 from crypto_info import Asset
 from crypto_info.entities.asset_entity import AssetEntity
+
+from crypto_info.services.binance import Binance
+from crypto_info.services.asset_service import AssetService
+
 from crypto_info.database.postgres_connection import PostgreSQLConnection
 # Externals
 
 
-def run():
+async def run():
     data = {
         'tick_size': '0.00001',
         'step_size': '1',
@@ -44,23 +50,23 @@ def run():
     AssetEntity.drop_table()
     AssetEntity.create_table()
     
-    #res = AssetEntity.create_asset(asset1)
-    res = AssetEntity.create_many_assets([asset1, asset2])
+    asset_service = AssetService(asset_entity=AssetEntity())
     
-    #res = AssetEntity.create_asset(asset2)
-    asset2.max_leverage = '20'
-    res = AssetEntity.update_asset(asset2.__dict__)
-    #print(res)
-    assets = AssetEntity.get_all_assets()
-    for a in assets:
-        print(a.symbol, " - ",a.price_factor)
+    exchange = Binance(asset_service=asset_service)
+    exchange_info = exchange._get_futures_exchange_info()
+
+    symbols = exchange_info['symbols']
     
-    res = AssetEntity.delete_asset_by_symbol("maticusdt")
-    print(res)
+    for symbol in symbols:
+        symbol_info = exchange._get_futures_exchange_info(symbol=symbol['symbol'])
+        print(symbol_info)
+        max_leverage = symbol_info['leverageBracket'][-1]['leverage']
+        print(symbol['symbol'], max_leverage)
+    
     db.close()
 
 if __name__ == '__main__':
-    run()
+    asyncio.run(run())
     '''
     class A(object):
         def __new__(cls, *args, **kwargs):
