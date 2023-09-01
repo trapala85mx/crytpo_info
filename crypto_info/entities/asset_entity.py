@@ -31,6 +31,11 @@ class AssetEntity(Model):
         database = None
         db_table = "assets_info"
 
+    
+    def __str__(self):
+        return self.symbol.upper()
+    
+    
     @classmethod
     def initialize(cls, database: PostgresqlDatabase | MySQLDatabase) -> None:
         """Set needed databse connection to work properly using the param injected
@@ -40,7 +45,7 @@ class AssetEntity(Model):
         cls._meta.database = database
     
     
-    def insert_asset(cls, asset: Asset) -> bool:
+    def insert_asset(self, asset: Asset) -> uuid:
         """Insert an Asset into the Database
         Args:
             asset (Asset): Assset to be stored in Database
@@ -62,19 +67,17 @@ class AssetEntity(Model):
             print(e)
         
         else:
-            if res:
-                return True
-            
-            return False
+            return res
+    
 
-    def insert_many_assets(cls, assets: list[Asset]) -> bool:
+    def insert_many_assets(self, assets: list[Asset]) -> tuple:
         """Insert many Assets into Database
         Args:
             assets (list[Asset]): List of Assets
         Raises:
             ValueError: If List of Assets == 0
         Returns:
-            bool: Tru if assets where inserted Flase if they were not
+            tuple: Tuple of uuid / ids of each Asset inserted into DataBase
         """
         if len(assets) == 0:
             raise ValueError("You didn't send any data to store")
@@ -82,11 +85,6 @@ class AssetEntity(Model):
         try:
             data = [a.__dict__ for a in assets]
             res = AssetEntity.insert_many(data).execute()
-        
-            if res:
-                return True
-            
-            return False
         
         except ValueError as e:
             print(e)
@@ -101,9 +99,12 @@ class AssetEntity(Model):
         
         except psycopg2.errors.UniqueViolation as e:
             print(e)
+        
+        else:
+            return res
     
     
-    def get_all_assets(cls) -> list[Asset]:
+    def get_all_assets(self) -> list[Asset]:
         """Retrieves all Assets from Datbase
         Raises:
             ValueError: If there are no Assets in DataBase
@@ -112,8 +113,11 @@ class AssetEntity(Model):
         """
         try:
             res = AssetEntity.select()
+            assets = []
             if res > 0:
-                return res
+                for crypto in res:
+                    assets.append(crypto)
+                return assets
             raise ValueError("No data to extract")
         
         except ValueError as e:
@@ -121,47 +125,16 @@ class AssetEntity(Model):
         
         except peewee.OperationalError as e:
             print("Something went wrong retrieving all Assets")
-    
-    
-    def update_asset(cls, data: dict) -> bool:
-        """Update an asset in database
-        Args:
-            data (dict): Dict with all atributes/cols to be updated
-        Raises:
-            ValueError: If no data is sent
-        Returns:
-            bool: True if asset is updated False if not
-        """
-        if len(data) == 0:
-            raise ValueError("You didn't send data to updated")
-        
-        try:
-            nrows = (
-                AssetEntity.update(**data)
-                .where(AssetEntity.symbol == data["symbol"].lower())
-                .execute()
-            )
             
-            if nrows >= 1:
-                return True
-            return False
-        
-        except ValueError as e:
-            print(e)
-        
-        except peewee.OperationalError as e:
-            print(f"Couln't update data for {data['symbol'].upper()}")
-            print(e)
     
-    
-    def delete_asset_by_symbol(cls, symbol: str) -> bool:
+    def delete_asset_by_symbol(clselfs, symbol: str) -> int:
         """Delete an Asset based in symbl
         Args:
             symbol (str): Asset Symbol to be deleted in Database
         Raises:
             ValueError: If no Symbol is sent
         Returns:
-            bool: True if asset is deleted False if not
+            int: number of rows deleted
         """
         if len(symbol) == 0:
             raise ValueError("You didn't send a symbol")
@@ -173,9 +146,9 @@ class AssetEntity(Model):
                 .execute()
             )
             
-            if nrows == 1:
+            if nrows > 0:
                 return True
-            return False
+            
         
         except ValueError as e:
             print(e)

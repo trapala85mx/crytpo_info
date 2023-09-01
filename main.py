@@ -51,17 +51,15 @@ async def run():
     AssetEntity.create_table()
     
     asset_service = AssetService(asset_entity=AssetEntity())
-    
-    exchange = Binance(asset_service=asset_service)
-    exchange_info = exchange._get_futures_exchange_info()
+    asset_service.insert_many_assets([asset1, asset2])
+    asset_service.delete_asset_by_symbol("maticusdt")
+    #assets = asset_service.get_all_assets()
+    #for a in assets:
+    #    print(a)
+    #exchange = Binance(asset_service=asset_service)
+    #exchange_info = exchange._get_futures_exchange_info()
 
-    symbols = exchange_info['symbols']
-    
-    for symbol in symbols:
-        symbol_info = exchange._get_futures_exchange_info(symbol=symbol['symbol'])
-        print(symbol_info)
-        max_leverage = symbol_info['leverageBracket'][-1]['leverage']
-        print(symbol['symbol'], max_leverage)
+    #symbols = exchange_info['symbols']
     
     db.close()
 
